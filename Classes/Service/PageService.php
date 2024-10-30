@@ -107,8 +107,6 @@ class PageService implements SingletonInterface
         $constraints[] = 'doktype NOT IN ('
             . PageRepository::DOKTYPE_BE_USER_SECTION
             . ','
-            . PageRepository::DOKTYPE_RECYCLER
-            . ','
             . PageRepository::DOKTYPE_SYSFOLDER
             . ')';
 
@@ -179,7 +177,7 @@ class PageService implements SingletonInterface
     public function getItemLink(array $page, bool $forceAbsoluteUrl = false): string
     {
         if ((integer) $page['doktype'] === PageRepository::DOKTYPE_LINK) {
-            $parameter = $this->getPageRepository()->getExtURL($page);
+            $parameter = $this->getExtURL($page);
         } else {
             $parameter = $page['uid'];
         }
@@ -199,6 +197,31 @@ class PageService implements SingletonInterface
         }
 
         return $GLOBALS['TSFE']->cObj->typoLink('', $config);
+    }
+
+    /**
+     * Returns the redirect URL for the input page row IF the doktype is set to 3.
+     *
+     * @param array $pagerow The page row to return URL type for
+     * @return string|bool The URL from based on the data from "pages:url". False if not found.
+     */
+    public function getExtURL($pagerow)
+    {
+        if ((int)$pagerow['doktype'] === PageRepository::DOKTYPE_LINK) {
+            $redirectTo = $pagerow['url'];
+            $uI = parse_url($redirectTo);
+            // If relative path, prefix Site URL
+            // If it's a valid email without protocol, add "mailto:"
+            if (!($uI['scheme'] ?? false)) {
+                if (GeneralUtility::validEmail($redirectTo)) {
+                    $redirectTo = 'mailto:' . $redirectTo;
+                } elseif ($redirectTo[0] !== '/') {
+                    $redirectTo = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams')->getSiteUrl() . $redirectTo;
+                }
+            }
+            return $redirectTo;
+        }
+        return false;
     }
 
     public function isAccessProtected(array $page): bool

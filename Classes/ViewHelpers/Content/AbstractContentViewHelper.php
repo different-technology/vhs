@@ -10,9 +10,12 @@ namespace FluidTYPO3\Vhs\ViewHelpers\Content;
 
 use FluidTYPO3\Vhs\Traits\SlideViewHelperTrait;
 use FluidTYPO3\Vhs\Utility\DoctrineQueryProxy;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -39,9 +42,8 @@ abstract class AbstractContentViewHelper extends AbstractViewHelper
 
     public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager): void
     {
-        $this->configurationManager = $configurationManager;
-        /** @var ContentObjectRenderer $contentObject */
-        $contentObject = $this->configurationManager->getContentObject();
+        $tsfe = $GLOBALS['TSFE'];
+        $contentObjectRenderer = GeneralUtility::makeInstance(ContentObjectRenderer::class, $tsfe);
         $this->contentObject = $contentObject;
     }
 

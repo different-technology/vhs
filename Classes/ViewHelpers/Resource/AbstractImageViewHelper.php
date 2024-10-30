@@ -162,7 +162,7 @@ abstract class AbstractImageViewHelper extends AbstractResourceViewHelper
      */
     public function preprocessSourceUri(string $source): string
     {
-        $typoscript = (new TsfeUtility())->getTyposcriptSetupArray());
+        $typoscript = (new TsfeUtility())->getTyposcriptSetupArray();
         if (!empty($typoscript['plugin.']['tx_vhs.']['settings.']['prependPath'])) {
             $source = $typoscript['plugin.']['tx_vhs.']['settings.']['prependPath'] . $source;
         } elseif (ContextUtility::isBackend() || !$this->arguments['relative']) {

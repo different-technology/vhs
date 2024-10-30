@@ -427,7 +427,7 @@ class LanguageMenuViewHelper extends AbstractTagBasedViewHelper
             }
             $result[$language->getLanguageId()] = [
                 'label' => $label,
-                'iso' => $language->getTwoLetterIsoCode(),
+                'iso' => $language->getLocale()->getLanguageCode(),
                 'flagIdentifier' => $flag
             ];
         }
