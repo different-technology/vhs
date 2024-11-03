@@ -135,9 +135,20 @@ class AssetService implements SingletonInterface
     public function getSettings(): array
     {
         if (null === static::$settingsCache) {
-            $allTypoScript = $this->configurationManager->getConfiguration(
-                ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
-            );
+
+            // workaround, @see https://review.typo3.org/c/Packages/TYPO3.CMS/+/82396
+            /** @var \TYPO3\CMS\Core\TypoScript\FrontendTypoScript $frontendTypoScript */
+            $frontendTypoScript = $GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.typoscript');
+            if (!$frontendTypoScript->hasSetup()) {
+                $frontendTypoScript = clone $frontendTypoScript;
+                $frontendTypoScript->setSetupArray([]);
+            }
+            $allTypoScript = $frontendTypoScript->getSetupArray();
+            // workaround end
+
+//            $allTypoScript = $this->configurationManager->getConfiguration(
+//                ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
+//            );
             static::$settingsCache = GeneralUtility::removeDotsFromTS(
                 $allTypoScript['plugin.']['tx_vhs.']['settings.'] ?? []
             );
